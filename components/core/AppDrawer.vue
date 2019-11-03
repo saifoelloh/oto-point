@@ -17,7 +17,7 @@
               <v-img :src="logo" height="34" contain />
             </v-list-tile-avatar>
             <v-list-tile-title class="title">
-              Vuetify MD
+              Oto Point
             </v-list-tile-title>
           </v-list-tile>
         </v-list>
@@ -59,44 +59,29 @@ export default {
       logo: '/vuetifylogo.png',
       links: [
         {
-          to: '/dashboard',
-          icon: 'mdi-view-dashboard',
-          text: 'Dashboard',
+          to: '/bengkel',
+          icon: 'mdi-wrench',
+          text: 'Bengkel',
         },
         {
-          to: '/user-profile',
-          icon: 'mdi-account',
-          text: 'User Profile',
+          to: '/mobil',
+          icon: 'mdi-car',
+          text: 'Mobil',
         },
         {
-          to: '/table-list',
-          icon: 'mdi-clipboard-outline',
-          text: 'Table List',
-        },
-        {
-          to: '/typography',
-          icon: 'mdi-format-font',
-          text: 'Typography',
-        },
-        {
-          to: '/icons',
-          icon: 'mdi-chart-bubble',
-          text: 'Icons',
-        },
-        {
-          to: '/maps',
-          icon: 'mdi-map-marker',
-          text: 'Maps',
-        },
-        {
-          to: '/notifications',
-          icon: 'mdi-bell',
-          text: 'Notifications',
+          to: '/user',
+          icon: 'mdi-account-group',
+          text: 'Users',
         },
         {
           to: '/dealer',
-          icon: 'mdi-wrench',
+          icon: 'mdi-cash',
           text: 'Dealer',
+        },
+        {
+          to: '/purchase',
+          icon: 'mdi-cash',
+          text: 'Pembelian',
         },
       ],
       responsive: true,
