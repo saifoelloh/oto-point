@@ -12,6 +12,13 @@
             <v-layout>
               <v-flex md5>
                 <v-form>
+                  <v-select
+                    v-model="mobil.dealer_id"
+                    :items="dealers"
+                    item-text="name"
+                    item-value="id"
+                    label="Dealer"
+                  ></v-select>
                   <v-text-field
                     v-model="mobil.name"
                     label="Nama"
@@ -44,6 +51,19 @@
                     label="Harga"
                     required
                   />
+                  <v-text-field
+                    v-model="mobil.point_value"
+                    type="number"
+                    min="0"
+                    label="Point"
+                    required
+                  />
+                  <img-inputer
+                    v-model="mobil.photo"
+                    placeholder="Drop car image"
+                    @change="onFileSelected"
+                    required
+                  />
                   <v-textarea
                     name="description"
                     label="Deskrisi"
@@ -63,8 +83,15 @@
 </template>
 
 <script charset="utf-8">
+import { mapActions, mapGetters } from 'vuex';
+import ImgInputer from 'vue-img-inputer';
+import 'vue-img-inputer/dist/index.css';
+
 export default {
   layout: 'dashboard',
+
+  components: { ImgInputer },
+
   data: () => ({
     mobil: {
       name: '',
@@ -73,25 +100,48 @@ export default {
       color: '',
       price: 0,
       description: '',
+      dealer_id: '',
+      point_value: 0,
     },
+    dealers: [],
   }),
 
+  mounted() {
+    this.fetch();
+  },
+
   methods: {
+    ...mapActions({
+      createCar: 'mobil/createCar',
+      getDealers: 'dealer/getDealers',
+    }),
+    async fetch() {
+      const token = localStorage.getItem('token');
+      const { data } = await this.getDealers({ token });
+      this.dealers = data;
+    },
     async submit() {
-      const params = {
-        name: this.mobil.name,
-        model: this.mobil.model,
-        machineCapacity: parseInt(this.mobil.machineCapacity),
-        color: this.mobil.color,
-        price: parseInt(this.mobil.price),
-        description: this.mobil.description,
-      };
-      const result = await this.createCar(params);
+      const token = localStorage.getItem('token');
+      const params = { ...this.mobil };
+      params.dealer_id = parseInt(params.dealer_id);
+      params.machine_capacity = parseInt(params.machine_capacity);
+      params.price = parseFloat(params.price);
+      params.point_value = parseInt(params.point_value);
+
+      const fd = await new FormData();
+      for (var key in params) {
+        fd.append(key, params[key]);
+      }
+
+      const result = await this.createCar({ fd, token });
       if (!result) {
         console.log(result);
       } else {
-        this.$router.go('mobil');
+        this.$router.go(-1);
       }
+    },
+    onFileSelected(event) {
+      this.mobil.photo = event.target.files[0];
     },
     reset() {
       this.$refs.form.reset();

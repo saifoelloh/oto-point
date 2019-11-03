@@ -5,37 +5,46 @@
         <material-card color="green" title="Edit Mobil">
           <v-card-text>
             <v-form>
-              <v-text-field :model="name" label="Nama" counter="20" required />
               <v-text-field
-                :model="model"
+                v-model="mobil.name"
+                label="Nama"
+                counter="20"
+                required
+              />
+              <v-text-field
+                v-model="mobil.model"
                 label="Model"
                 counter="20"
                 required
               />
               <v-text-field
-                :model="machineCapacity"
-                type="number"
-                min="0"
-                label="Kapasitas Mesin"
-                required
-              />
-              <v-text-field
-                :model="color"
+                v-model="mobil.color"
                 label="Warna"
                 counter="20"
                 required
               />
               <v-text-field
-                :model="price"
+                v-model="mobil.machine_capacity"
+                label="Kapasitas Mesin"
+                required
+              />
+              <v-text-field
+                v-model="mobil.price"
                 type="number"
                 min="0"
                 label="Harga"
                 required
               />
+              <img-inputer
+                v-model="mobil.photo"
+                placeholder="Drop car image"
+                @change="onFileSelected"
+                required
+              />
               <v-textarea
                 name="description"
                 label="Deskrisi"
-                :value="description"
+                v-model="mobil.description"
                 required
               ></v-textarea>
               <v-flex text-xs-right>
@@ -52,17 +61,21 @@
             <v-layout align-center>
               <v-flex md6>
                 <v-avatar slot="offset" class="mx-auto d-block" size="230">
-                  <img :src="mobil.photo" />
+                  <img :src="base + mobil.photo" />
                 </v-avatar>
               </v-flex>
               <v-flex md6>
                 <p>Nama : {{ mobil.name }}</p>
                 <p>Model : {{ mobil.model }}</p>
-                <p>Kapasitas Mesin : {{ mobil.machineCapacity }}</p>
+                <p>Kapasitas Mesin : {{ mobil.machine_capacity }}</p>
                 <p>Warna : {{ mobil.color }}</p>
-                <p>Harga : {{ mobil.harga }}</p>
+                <p>Harga :</p>
                 <blockquote class="blockquote">
-                  {{ `Rp. ${mobil.price} | Point ${mobil.point}` }}
+                  {{ `Rp. ${mobil.price}` }}
+                </blockquote>
+                <p>Point :</p>
+                <blockquote class="blockquote">
+                  {{ `Point ${mobil.point_value}` }}
                 </blockquote>
               </v-flex>
             </v-layout>
@@ -76,13 +89,15 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import materialCard from '~/components/material/AppCard';
+import ImgInputer from 'vue-img-inputer';
+import 'vue-img-inputer/dist/index.css';
 
 export default {
   head: {
     title: 'Oto Point | Dealer',
   },
 
-  components: { materialCard },
+  components: { materialCard, ImgInputer },
 
   layout: 'dashboard',
 
@@ -90,13 +105,14 @@ export default {
     mobil: {
       name: '',
       model: '',
-      machineCapacity: 0,
+      machine_capacity: '',
       color: '',
       price: 0,
-      point: 0,
+      point_value: 0,
       description: '',
       photo: '',
     },
+    base: 'https://57b6a033.ngrok.io/',
   }),
 
   mounted() {
@@ -104,12 +120,31 @@ export default {
   },
 
   methods: {
+    ...mapActions({ getCar: 'mobil/getCar', editCar: 'mobil/editCar' }),
     async fetch(id) {
-      console.log({ id, msg: 'ini id boss' });
-      const result = await this.getCar(id);
-      this.mobil = result;
+      const token = localStorage.getItem('token');
+      const { data } = await this.getCar({ id, token });
+      this.mobil = data;
     },
-    async submit() {},
+    async submit() {
+      const token = localStorage.getItem('token');
+      const id = this.$route.params.id;
+      const params = { ...this.mobil };
+      params.price = parseInt(params.price);
+      params.point_value = parseInt(params.point_value);
+
+      console.log({ params });
+      const fd = await new FormData();
+      for (var key in params) {
+        fd.append(key, params[key]);
+      }
+
+      const result = await this.editCar({ id, token, fd });
+      if (result) this.$router.go(-1);
+    },
+    onFileSelected(event) {
+      this.mobil.photo = event.target.files[0];
+    },
   },
 };
 </script>
