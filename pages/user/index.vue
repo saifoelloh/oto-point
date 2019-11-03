@@ -9,12 +9,29 @@
       <v-card-text>
         <v-data-table
           :headers="headers"
-          :items="posts"
-          :items-per-page="10"
+          :items="data"
+          :total-items="data.length"
+          row-per-page-items="10"
           loading
           loading-text="Loading... Please wait"
+          :pagination.sync="pagination"
           class="elevation-1"
         >
+          <template v-slot:items="props">
+            <td>{{ props.item.id }}</td>
+            <td>{{ props.item.full_name }}</td>
+            <td>{{ props.item.username }}</td>
+            <td>{{ props.item.email }}</td>
+            <td>{{ props.item.role }}</td>
+            <td class="display-inline-flex">
+              <v-btn color="info" small :to="`/user/${props.item.id}/edit`">
+                <v-icon>border_color</v-icon>
+              </v-btn>
+              <v-btn color="danger" small @click="onDelete(props.item.id)">
+                <v-icon>delete</v-icon>
+              </v-btn>
+            </td>
+          </template>
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -28,7 +45,9 @@ export default {
   head: {
     title: 'Oto Point | User',
   },
+
   layout: 'dashboard',
+
   data: () => ({
     name: '',
     age: 0,
@@ -37,6 +56,10 @@ export default {
       {
         text: 'No',
         value: 'id',
+      },
+      {
+        text: 'Nama Lengkap',
+        value: 'full_name',
       },
       {
         text: 'Username',
@@ -55,16 +78,25 @@ export default {
     data: [],
   }),
 
-  created() {
+  watch: {
+    pagination: {
+      handler() {
+        this.getUsers();
+      },
+      deep: true,
+    },
+  },
+
+  mounted() {
     this.fetchUsers();
   },
 
   methods: {
     ...mapActions({
-      fetchComments: 'dealer/fetchComments',
+      getUsers: 'user/getUsers',
     }),
     async fetchUsers() {
-      const data = await this.getUsers();
+      const { data } = await this.getUsers();
       this.data = data;
     },
   },

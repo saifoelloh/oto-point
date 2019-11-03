@@ -1,34 +1,34 @@
 async function getUsers(_) {
-  const result = await this.$axios.get('http://c4f73f6d.ngrok.io');
-  console.log({ result });
-  return result;
+  const { data } = await this.$axios.get('/user');
+  console.log({ data, msg: 'get all users' });
+  return data;
 }
 async function createUser(_, params) {
-  console.log({ params, msg: 'ini param' });
-  const result = await this.$axios.post(
-    'http://c4f73f6d.ngrok.io/auth/create',
-    { ...params },
-  );
-  console.log(result);
-  return result;
+  const { data } = await this.$axios.post('/auth/register', { ...params });
+  console.log({ data, msg: 'response create user' });
+  return data;
 }
 
 async function getUser(_, id) {
-  console.log({ id, msg: 'ini params get user' });
-  const result = await this.$axios.get(`http://c4f73f6d.ngrok.io/auth/${id}`);
-  console.log({ result });
-  return result;
+  const { data } = await this.$axios.get(`/user/${id}`);
+  return data;
 }
 
-async function editUser(_, id, params) {
-  console.log({ params, msg: 'ini param edit user' });
-  const result = await this.$axios.put(`http://c4f73f6d.ngrok.io/auth/${id}`, {
-    ...params,
-  });
-  console.log({ result, msg: 'ini hasil edit user' });
+async function editUser(_, id, params = {}) {
+  console.log(params, 'ini param');
+  const { data } = await this.$axios.put(`/user/${id}`, { ...params });
+  return data;
+}
+
+async function delUser(_, id) {
+  const { data } = await this.$axios.delete(`/user/${id}`);
+  return data;
 }
 
 export default {
+  getUsers,
+  getUser,
   createUser,
   editUser,
+  delUser,
 };

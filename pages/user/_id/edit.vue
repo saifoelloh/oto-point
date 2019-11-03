@@ -6,6 +6,12 @@
           <v-card-text>
             <v-form>
               <v-text-field
+                v-model="user.full_name"
+                label="Nama Lengkap"
+                counter="20"
+                required
+              />
+              <v-text-field
                 v-model="user.username"
                 label="Username"
                 counter="20"
@@ -60,13 +66,22 @@ export default {
     roles: ['user', 'admin', 'bengkel', 'dealer'],
   }),
 
+  mounted() {
+    this.fetch(this.$route.params.id);
+  },
+
   methods: {
+    ...mapActions({ getUser: 'user/getUser', editUser: 'user/editUser' }),
     async fetch(id) {
-      const { data } = id;
+      const { data } = await this.getUser(id);
+      this.user = { ...data };
+      this.user.password = '';
     },
     async submit() {
       const params = { ...this.user };
-      console.log(params);
+      console.log({ params });
+      const { data } = await this.editUser(this.$route.params.id, params);
+      if (data) this.$router.go(-1);
     },
   },
 };

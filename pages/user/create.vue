@@ -19,6 +19,12 @@
                     required
                   />
                   <v-text-field
+                    v-model="user.full_name"
+                    label="Nama Lengkap"
+                    counter="20"
+                    required
+                  />
+                  <v-text-field
                     v-model="user.email"
                     label="Email"
                     counter="20"
@@ -48,26 +54,34 @@
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
+  head: {
+    title: 'Oto Point | User',
+  },
+
   layout: 'dashboard',
+
   data: () => ({
     user: {
       username: '',
+      full_name: '',
       email: '',
       password: '',
       role: '',
     },
-    roles: ['user', 'admin', 'dealer', 'bengkel'],
+    roles: ['admin', 'dealer', 'bengkel'],
   }),
 
   methods: {
     ...mapActions({ createUser: 'user/createUser' }),
     async submit() {
-      const params = { ...this.user };
-      const result = this.createUser(params);
+      const token = localStorage.getItem('token');
+      const datum = { ...this.user };
+      const data = this.createUser({ token, datum });
+      if (data.status) this.$router.go(-1);
     },
-  },
-  reset() {
-    this.$refs.form.reset();
+    reset() {
+      this.$refs.form.reset();
+    },
   },
 };
 </script>
